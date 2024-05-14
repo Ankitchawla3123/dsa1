@@ -1,0 +1,194 @@
+#include <iostream>
+#include <unordered_map>
+#include <list>
+#include <queue>
+#include <stack>
+using namespace std;
+
+class graph
+{
+private:
+    unordered_map<int , list<int>> adj;
+    int v;
+
+    void runbfs(unordered_map<int, bool> &visited, int node){
+        queue<int> check;
+        check.push(node);
+        visited[node]=true;
+        while (!check.empty())
+        {
+            int frontnode=check.front();
+            cout<<frontnode<<" ";
+            check.pop();
+            for (auto it:adj[frontnode])
+            {
+                if (visited[it]!=true)
+                {
+                    check.push(it);
+                    visited[it]=true;
+                }
+            }
+        }
+    }
+
+    void rundfs(unordered_map<int, bool> &visited, int node){
+        unordered_map <int , bool> instack;
+        for (int i = 0; i < v; i++)
+        {
+            instack[i]=false;
+        }
+        stack<int> check;
+        check.push(node);
+        while (!check.empty()){
+            int frontnode=check.top();
+            check.pop();
+            if (!visited[frontnode])
+            {
+                cout<<frontnode<<" ";
+                visited[frontnode]=true;
+            }
+            for (auto it:adj[frontnode])
+            {
+                if (visited[it]!=true && instack[it]!=true)
+                {
+                    check.push(it);
+                    instack[it]=true;
+                }
+            }
+            
+            
+        }
+    }
+public:
+    graph(int vertices){
+        v=vertices;
+        for (int i = 0; i < v; i++)
+        {
+            adj[i];
+        }
+        cout<<"Vertices are added named from 0 to "<<vertices-1<<endl;
+        
+        
+    }
+    bool add_edge(int a, int b){
+        bool val=true;
+        for(auto it:adj){
+            if (it.first==a || it.first==b )
+            {
+                for (auto j:it.second){
+                    if (it.first==a && j==b || it.first==b && j==a)
+                    {
+                        cout<<"Edge already exist ";
+                        val=false;
+                        return val;
+                    }
+                }
+            }
+
+        }
+        
+        if (val)
+        {
+                adj[a].push_back(b);
+                adj[b].push_back(a);
+        }
+        return val;
+        
+
+    }
+    void print(){
+        for(auto it:adj){
+            cout<<it.first<<" -> ";
+            for (auto j:it.second){
+                cout<<j<<",";
+            }
+            cout<<endl;
+        }
+        
+    }
+    void bfs(int start){
+        unordered_map<int, bool> visited;
+        
+        for (int i = 0; i < v; i++)
+        {
+            visited[i]=false;
+        }
+        runbfs(visited , start);
+        for (int i = 0; i < v; i++)
+        {
+            if (!visited[i])
+            {
+                runbfs(visited,i);
+            }
+        }
+    }
+
+    void dfs(int start){
+        unordered_map<int, bool> visited2;
+        for (int i = 0; i < v; i++)
+        {
+            visited2[i]=false;
+        }
+        rundfs(visited2 , start);
+        for (int i = 0; i < v; i++)
+        {
+            if (!visited2[i])
+            {
+                runbfs(visited2,i);
+            }
+        }
+
+    }
+};
+
+int main()
+{
+    int v;
+    cout<<endl<<"Enter The Number of Vertices: ";
+    cin>>v;
+    graph g(v);
+    cout<<endl<<"Enter The Number Edges you want to Add: ";
+    int ed;
+    cin>>ed;
+
+    int edcopy=ed;
+    cout<<endl<<"'3 4' means 3 connected to 4 and vice versa and "<<endl<< "enter the edge in this format: "<<endl ;
+    cout<<endl;
+    int v1;
+    int v2;
+    int count=0;
+    while (ed)
+    {
+        cout<<"Enter the edge: ";
+        cin>>v1>>v2;
+        if (v1>=v || v2>=v)
+        {
+            cout<<"Vertex doesn't exist , vertices are from 0 to "<<v-1<<endl;
+        }
+        else if (v1==v2)
+        {
+            cout<<"Cannot enter same vertex, enter again: "<<endl;
+        }
+        
+        else if (!g.add_edge(v1,v2))
+        {
+            cout<<"enter again: "<<endl;
+        }
+        else{
+            cout<<"Edge connected sucessfully"<<endl;
+            ed--;
+            cout<<edcopy-ed<<" edges added"<<endl;
+        }
+    }
+    
+    g.print();
+    cout<<"Enter start node for bfs: ";
+    int start;
+    cin>>start;
+    g.bfs(start);
+    cout<<endl;
+    cout<<"Enter start node for dfs: ";
+    cin>>start;
+    g.dfs(start);
+    return 0;
+}
